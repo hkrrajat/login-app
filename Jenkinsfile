@@ -1,0 +1,65 @@
+pipeline {
+
+    agent any
+
+    environment {
+
+        AWS_REGION = 'ap-south-1'
+        ECR_REPO = '943246945615.dkr.ecr.ap-south-1.amazonaws.com/login-app
+        IMAGE_TAG = "${BUILD_NUMBER}"
+
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/hkrrajat/login-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t login-app:${IMAGE_TAG} .'
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-login'
+                ]]) {
+
+                    sh '''
+                    aws ecr get-login-password --region $AWS_REGION | \
+                    docker login \
+                    --username AWS \
+                    --password-stdin \
+                    $ECR_REPO
+                    '''
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+
+                sh '''
+                docker tag login-app:${IMAGE_TAG} \
+                $ECR_REPO:${IMAGE_TAG}
+
+                docker push $ECR_REPO:${IMAGE_TAG}
+                '''
+            }
+        }
+
+    }
+
+}
