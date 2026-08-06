@@ -45,7 +45,7 @@ pipeline {
                     docker login \
                     --username AWS \
                     --password-stdin \
-                    $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com
+                    $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO     //updated code here 
                     '''
                 }
             }
@@ -63,6 +63,27 @@ pipeline {
             }
         }
 
+        stage('Deploy Kubernetes') {
+
+            steps {
+
+                sh """
+
+                sed -i 's|image:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:${IMAGE_TAG}|g' deployment.yaml
+
+                kubectl apply -f deployment.yaml
+
+                kubectl apply -f service.yaml
+
+                kubectl apply -f hpa.yaml
+
+                kubectl rollout status deployment/login-app
+
+                """
+
+            }
+
+        }
     }
 
 }
