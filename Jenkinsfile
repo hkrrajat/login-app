@@ -5,7 +5,9 @@ pipeline {
     environment {
 
         AWS_REGION = 'ap-south-1'
-        ECR_REPO = '943246945615.dkr.ecr.ap-south-1.amazonaws.com/login-app
+        //ECR_REPO = '943246945615.dkr.ecr.ap-south-1.amazonaws.com/login-app'
+        AWS_ACCOUNT_ID = '943246945615'
+        ECR_REPO = 'login-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
 
     }
@@ -42,7 +44,7 @@ pipeline {
                     docker login \
                     --username AWS \
                     --password-stdin \
-                    $ECR_REPO
+                    $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com
                     '''
                 }
             }
