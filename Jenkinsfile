@@ -16,15 +16,16 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/hkrrajat/login-app.git'
+                //git 'https://github.com/hkrrajat/login-app.git'
+                git branch: 'main', url: 'https://github.com/hkrrajat/login-app.git'
             }
         }
 
-        stage('Install Dependencies') {
+       stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
-        }
+       }
 
         stage('Build Docker Image') {
             steps {
@@ -52,12 +53,12 @@ pipeline {
 
         stage('Push Image') {
             steps {
-
                 sh '''
                 docker tag login-app:${IMAGE_TAG} \
-                $ECR_REPO:${IMAGE_TAG}
-
-                docker push $ECR_REPO:${IMAGE_TAG}
+                $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:${IMAGE_TAG}
+        
+                docker push \
+                $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:${IMAGE_TAG}
                 '''
             }
         }
