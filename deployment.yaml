@@ -19,18 +19,16 @@ spec:
         app: login-app
 
     spec:
-      template:
-        spec:
-          imagePullSecrets:
-            - name: ecr-secret
+      imagePullSecrets:
+        - name: ecr-secret
       
       containers:
 
       - name: login-app
 
-        image: 943246945615.dkr.ecr.ap-south-1.amazonaws.com/login-app:latest //instead of latest 7 needs to be replaced 
+        image: 943246945615.dkr.ecr.ap-south-1.amazonaws.com/login-app:latest 
 
-        imagePullPolicy: Always  //to be commented 
+        imagePullPolicy: Always   
 
         ports:
 
